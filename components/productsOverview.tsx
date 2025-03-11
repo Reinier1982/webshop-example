@@ -11,26 +11,41 @@ import {
 import { Product } from "./shared/types";
 import { useProductStore, useCategory } from "@/lib/store";
 
-export default function ProductsOverview(): JSX.Element {
+interface ProductsOverviewProps {
+  initialProducts?: Product[];
+}
+
+export default function ProductsOverview({
+  initialProducts = [],
+}: ProductsOverviewProps): JSX.Element {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const skip = searchParams.get("skip") || "";
   const { products, setProducts } = useProductStore();
   const { selectedCategory } = useCategory();
-  console.log("Hier?");
+
   useEffect(() => {
-    console.log("running");
+    if (
+      initialProducts &&
+      initialProducts.length > 0 &&
+      products.length === 0
+    ) {
+      setProducts(initialProducts);
+    }
+  }, [initialProducts, products.length, setProducts]);
+
+  useEffect(() => {
     const fetchProducts = async () => {
-      console.log("fetching products");
-      const fetchedProducts: Product[] = selectedCategory
-        ? await getProductByCategory(selectedCategory)
-        : search
-        ? await getFilteredProducts(search)
-        : skip
-        ? await getLimitProducts(skip)
-        : await getProducts();
-      console.log("fetched products", JSON.stringify(fetchedProducts));
-      setProducts(fetchedProducts);
+      if (selectedCategory || search || skip) {
+        const fetchedProducts: Product[] = selectedCategory
+          ? await getProductByCategory(selectedCategory)
+          : search
+            ? await getFilteredProducts(search)
+            : skip
+              ? await getLimitProducts(skip)
+              : await getProducts();
+        setProducts(fetchedProducts);
+      }
     };
     fetchProducts();
   }, [search, skip, selectedCategory, setProducts]);
