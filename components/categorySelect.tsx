@@ -14,16 +14,26 @@ import { useEffect } from "react";
 import { Category } from "./shared/types";
 import { useCategory } from "@/lib/store";
 
-export default function CategorySelect() {
+interface CategorySelectProps {
+  initialCategories?: Category[];
+}
+
+export default function CategorySelect({
+  initialCategories = [],
+}: CategorySelectProps) {
   const { categorySelected, categories, setCategories } = useCategory();
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      const cats: Category[] = await getCategories();
-      setCategories(cats);
-    };
-    fetchCategories();
-  }, []);
+    if (initialCategories && initialCategories.length > 0) {
+      setCategories(initialCategories);
+    } else {
+      const fetchCategories = async () => {
+        const cats: Category[] = await getCategories();
+        setCategories(cats);
+      };
+      fetchCategories();
+    }
+  }, [initialCategories, setCategories]);
 
   const selectedValue = (e: string) => {
     if (e) {
