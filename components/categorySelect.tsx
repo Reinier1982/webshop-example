@@ -27,7 +27,9 @@ export default function CategorySelect() {
 
   const selectedValue = (e: string) => {
     if (e) {
-      categorySelected(e);
+      if (e === "empty") {
+        categorySelected("");
+      } else categorySelected(e);
     }
   };
 
@@ -39,6 +41,7 @@ export default function CategorySelect() {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Category</SelectLabel>
+          <SelectItem value="empty">All</SelectItem>
           {categories.map((category) => (
             <SelectItem key={category.slug} value={category.slug}>
               {category.name}
